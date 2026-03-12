@@ -1,31 +1,38 @@
 package com.example.userservice.specification;
 
+import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.entity.PaymentCard;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PaymentCardSpecification {
 
-  public static Specification<PaymentCard> hasUserFirstName(String firstName) {
-    return (root, query, cb) -> {
-      if (firstName == null || firstName.isBlank()) {
-        return null;
-      }
-      return cb.like(
-              cb.lower(root.join("user").get("firstName")),
-              "%" + firstName.toLowerCase() + "%"
-      );
-    };
+  public Specification<PaymentCard> build(PaymentCardFilter filter) {
+    Specification<PaymentCard> spec = (root, query, cb) -> cb.conjunction();
+    if (filter.userName() != null && !filter.userName().isBlank()) {
+      spec = spec.and(hasUserFirstName(filter.userName()));
+    }
+    if (filter.userSurname() != null && !filter.userSurname().isBlank()) {
+      spec = spec.and(hasUserSurname(filter.userSurname()));
+    }
+    return spec;
   }
 
-  public static Specification<PaymentCard> hasUserSurname(String surname) {
-    return (root, query, cb) -> {
-      if (surname == null || surname.isBlank()) {
-        return null;
-      }
-      return cb.like(
-              cb.lower(root.join("user").get("surname")),
-              "%" + surname.toLowerCase() + "%"
-      );
-    };
+  public Specification<PaymentCard> hasUserFirstName(String firstName) {
+    return (root, query, cb) ->
+            cb.like(
+                    cb.lower(root.join("user").get("firstName")),
+                    "%" + firstName.toLowerCase() + "%"
+            );
   }
+
+  public Specification<PaymentCard> hasUserSurname(String surname) {
+    return (root, query, cb) ->
+            cb.like(
+                    cb.lower(root.join("user").get("surname")),
+                    "%" + surname.toLowerCase() + "%"
+            );
+  }
+
 }
