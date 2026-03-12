@@ -59,17 +59,19 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public void activate(Long id) {
-    User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-    user.setActive(true);
+    if (!userRepository.existsById(id)) {
+      throw new RuntimeException("User not found");
+    }
+    userRepository.updateActiveStatus(id, true);
   }
 
   @Override
   @Transactional
   public void deactivate(Long id) {
-    User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-    user.setActive(false);
+    if (!userRepository.existsById(id)) {
+      throw new RuntimeException("User not found");
+    }
+    userRepository.updateActiveStatus(id, false);
   }
 
   @Override
@@ -77,5 +79,4 @@ public class UserServiceImpl implements UserService {
   public void delete(Long id) {
     userRepository.deleteById(id);
   }
-
 }

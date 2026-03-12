@@ -7,15 +7,8 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record PaymentCardUpdateDto(
-        @NotBlank
-        @Size(min = 16, max = 16)
-        String cardNumber,
-
-        @NotBlank
-        String cardHolder,
-
-        @NotNull
-        LocalDate expirationDate,
-
+        @NotBlank @Size(min = 16, max = 16) String cardNumber,
+        @NotBlank String cardHolder,
+        @NotNull LocalDate expirationDate,
         Boolean active) {
 }

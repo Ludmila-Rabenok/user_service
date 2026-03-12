@@ -81,17 +81,19 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Override
   @Transactional
   public void activate(Long id) {
-    PaymentCard card = cardRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
-    card.setActive(true);
+    if (!cardRepository.existsById(id)) {
+      throw new RuntimeException("Card not found");
+    }
+    cardRepository.updateActiveStatus(id, true);
   }
 
   @Override
   @Transactional
   public void deactivate(Long id) {
-    PaymentCard card = cardRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
-    card.setActive(false);
+    if (!cardRepository.existsById(id)) {
+      throw new RuntimeException("Card not found");
+    }
+    cardRepository.updateActiveStatus(id, false);
   }
 
   @Override
@@ -99,5 +101,4 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   public void delete(Long id) {
     cardRepository.deleteById(id);
   }
-
 }
