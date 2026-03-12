@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/02-create-payment-cards.yaml
   - include:
       file: db/changelog/03-add-indexes.yaml
+  - include:
+      file: db/changelog/04-insert-data.yaml

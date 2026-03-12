@@ -1,0 +1,208 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-users
+      author: rabenok
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: name, value: "Alice" }
+              - column: { name: surname, value: "Johnson" }
+              - column: { name: birth_date, valueDate: "1990-01-15" }
+              - column: { name: email, value: "alice.johnson@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: name, value: "Bob" }
+              - column: { name: surname, value: "Williams" }
+              - column: { name: birth_date, valueDate: "1985-03-22" }
+              - column: { name: email, value: "bob.williams@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: name, value: "Clara" }
+              - column: { name: surname, value: "Smith" }
+              - column: { name: birth_date, valueDate: "1992-07-10" }
+              - column: { name: email, value: "clara.smith@example.com" }
+              - column: { name: active, valueBoolean: false }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: name, value: "David" }
+              - column: { name: surname, value: "Brown" }
+              - column: { name: birth_date, valueDate: "1988-11-05" }
+              - column: { name: email, value: "david.brown@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: name, value: "Eva" }
+              - column: { name: surname, value: "Miller" }
+              - column: { name: birth_date, valueDate: "1995-09-18" }
+              - column: { name: email, value: "eva.miller@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: name, value: "Frank" }
+              - column: { name: surname, value: "Davis" }
+              - column: { name: birth_date, valueDate: "1983-04-12" }
+              - column: { name: email, value: "frank.davis@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: name, value: "Grace" }
+              - column: { name: surname, value: "Wilson" }
+              - column: { name: birth_date, valueDate: "1991-06-30" }
+              - column: { name: email, value: "grace.wilson@example.com" }
+              - column: { name: active, valueBoolean: false }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: name, value: "Henry" }
+              - column: { name: surname, value: "Moore" }
+              - column: { name: birth_date, valueDate: "1987-02-14" }
+              - column: { name: email, value: "henry.moore@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: name, value: "Ivy" }
+              - column: { name: surname, value: "Taylor" }
+              - column: { name: birth_date, valueDate: "1993-12-01" }
+              - column: { name: email, value: "ivy.taylor@example.com" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: id, valueNumeric: 10 }
+              - column: { name: name, value: "Jack" }
+              - column: { name: surname, value: "Anderson" }
+              - column: { name: birth_date, valueDate: "1989-08-25" }
+              - column: { name: email, value: "jack.anderson@example.com" }
+              - column: { name: active, valueBoolean: false }
+
+  - changeSet:
+      id: insert-cards
+      author: rabenok
+      changes:
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 1 }
+              - column: { name: user_id, valueNumeric: 1 }
+              - column: { name: number, value: "1111-2222-3333-4444" }
+              - column: { name: holder, value: "Alice Johnson" }
+              - column: { name: expiration_date, valueDate: "2027-05-01" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 2 }
+              - column: { name: user_id, valueNumeric: 1 }
+              - column: { name: number, value: "5555-6666-7777-8888" }
+              - column: { name: holder, value: "Alice Johnson" }
+              - column: { name: expiration_date, valueDate: "2026-11-01" }
+              - column: { name: active, valueBoolean: false }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 3 }
+              - column: { name: user_id, valueNumeric: 2 }
+              - column: { name: number, value: "9999-0000-1111-2222" }
+              - column: { name: holder, value: "Bob Williams" }
+              - column: { name: expiration_date, valueDate: "2028-03-01" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 4 }
+              - column: { name: user_id, valueNumeric: 3 }
+              - column: { name: number, value: "3333-4444-5555-6666" }
+              - column: { name: holder, value: "Clara Smith" }
+              - column: { name: expiration_date, valueDate: "2025-09-01" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 5 }
+              - column: { name: user_id, valueNumeric: 4 }
+              - column: { name: number, value: "7777-8888-9999-0000" }
+              - column: { name: holder, value: "David Brown" }
+              - column: { name: expiration_date, valueDate: "2029-01-01" }
+              - column: { name: active, valueBoolean: false }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 6 }
+              - column: { name: user_id, valueNumeric: 5 }
+              - column: { name: number, value: "1212-3434-5656-7878" }
+              - column: { name: holder, value: "Eva Miller" }
+              - column: { name: expiration_date, valueDate: "2027-07-01" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 7 }
+              - column: { name: user_id, valueNumeric: 6 }
+              - column: { name: number, value: "9090-8080-7070-6060" }
+              - column: { name: holder, value: "Frank Davis" }
+              - column: { name: expiration_date, valueDate: "2026-04-01" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 8 }
+              - column: { name: user_id, valueNumeric: 7 }
+              - column: { name: number, value: "4545-5656-6767-7878" }
+              - column: { name: holder, value: "Grace Wilson" }
+              - column: { name: expiration_date, valueDate: "2025-12-01" }
+              - column: { name: active, valueBoolean: false }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 9 }
+              - column: { name: user_id, valueNumeric: 8 }
+              - column: { name: number, value: "2323-3434-4545-5656" }
+              - column: { name: holder, value: "Henry Moore" }
+              - column: { name: expiration_date, valueDate: "2028-10-01" }
+              - column: { name: active, valueBoolean: true }
+
+        - insert:
+            tableName: payment_cards
+            columns:
+              - column: { name: id, valueNumeric: 10 }
+              - column: { name: user_id, valueNumeric: 9 }
+              - column: { name: number, value: "9898-8787-7676-6565" }
+              - column: { name: holder, value: "Ivy Taylor" }
+              - column: { name: expiration_date, valueDate: "2027-02-01" }
+              - column: { name: active, valueBoolean: true }
