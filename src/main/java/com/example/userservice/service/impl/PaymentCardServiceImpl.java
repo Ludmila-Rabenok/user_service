@@ -85,7 +85,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Transactional
   public void activate(Long id) {
     if (!cardRepository.existsById(id)) {
-      throw new RuntimeException("Card not found");
+      throw new PaymentCardNotFoundException(id);
     }
     cardRepository.updateActiveStatus(id, true);
   }
@@ -94,7 +94,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Transactional
   public void deactivate(Long id) {
     if (!cardRepository.existsById(id)) {
-      throw new RuntimeException("Card not found");
+      throw new PaymentCardNotFoundException(id);
     }
     cardRepository.updateActiveStatus(id, false);
   }

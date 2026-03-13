@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void activate(Long id) {
     if (!userRepository.existsById(id)) {
-      throw new RuntimeException("User not found");
+      throw new UserNotFoundException(id);
     }
     userRepository.updateActiveStatus(id, true);
   }
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void deactivate(Long id) {
     if (!userRepository.existsById(id)) {
-      throw new RuntimeException("User not found");
+      throw new UserNotFoundException(id);
     }
     userRepository.updateActiveStatus(id, false);
   }
