@@ -1,11 +1,14 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.dto.PaymentCardCreateDto;
-import com.example.userservice.dto.PaymentCardDto;
+import com.example.userservice.dto.PaymentCardResponseDto;
 import com.example.userservice.dto.PaymentCardUpdateDto;
 import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
+import com.example.userservice.exception.CardLimitExceededException;
+import com.example.userservice.exception.PaymentCardNotFoundException;
+import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.PaymentCardMapper;
 import com.example.userservice.repository.PaymentCardRepository;
 import com.example.userservice.repository.UserRepository;
@@ -34,12 +37,12 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   @Override
   @Transactional
-  public PaymentCardDto create(Long userId, PaymentCardCreateDto dto) {
+  public PaymentCardResponseDto create(Long userId, PaymentCardCreateDto dto) {
     User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(userId));
     long cardCount = cardRepository.countByUserId(userId);
     if (cardCount >= 5) {
-      throw new RuntimeException("User cannot have more than 5 cards");
+      throw new CardLimitExceededException(userId);
     }
     PaymentCard card = cardMapper.toEntity(dto);
     card.setUser(user);
@@ -47,14 +50,14 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   }
 
   @Override
-  public PaymentCardDto getById(Long id) {
+  public PaymentCardResponseDto getById(Long id) {
     return cardRepository.findById(id)
             .map(cardMapper::toDto)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new PaymentCardNotFoundException(id));
   }
 
   @Override
-  public List<PaymentCardDto> getByUserId(Long userId) {
+  public List<PaymentCardResponseDto> getByUserId(Long userId) {
     return cardRepository.findCardsByUserId(userId)
             .stream()
             .map(cardMapper::toDto)
@@ -62,7 +65,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   }
 
   @Override
-  public Page<PaymentCardDto> getAll(PaymentCardFilter filter, Pageable pageable) {
+  public Page<PaymentCardResponseDto> getAll(PaymentCardFilter filter, Pageable pageable) {
     return cardRepository.findAll(
             cardSpecification.build(filter),
             pageable
@@ -71,9 +74,9 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   @Override
   @Transactional
-  public PaymentCardDto update(Long id, PaymentCardUpdateDto dto) {
+  public PaymentCardResponseDto update(Long id, PaymentCardUpdateDto dto) {
     PaymentCard card = cardRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new PaymentCardNotFoundException(id));
     cardMapper.updateEntityFromDto(dto, card);
     return cardMapper.toDto(cardRepository.save(card));
   }
@@ -82,7 +85,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Transactional
   public void activate(Long id) {
     PaymentCard card = cardRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new PaymentCardNotFoundException(id));
     card.setActive(true);
   }
 
@@ -90,7 +93,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Transactional
   public void deactivate(Long id) {
     PaymentCard card = cardRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Card not found"));
+            .orElseThrow(() -> new PaymentCardNotFoundException(id));
     card.setActive(false);
   }
 
@@ -99,5 +102,4 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   public void delete(Long id) {
     cardRepository.deleteById(id);
   }
-
 }

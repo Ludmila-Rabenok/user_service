@@ -1,10 +1,11 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.dto.UserCreateDto;
-import com.example.userservice.dto.UserDto;
+import com.example.userservice.dto.UserResponseDto;
 import com.example.userservice.dto.UserUpdateDto;
 import com.example.userservice.dto.filter.UserFilter;
 import com.example.userservice.entity.User;
+import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
@@ -27,20 +28,20 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDto create(UserCreateDto dto) {
+  public UserResponseDto create(UserCreateDto dto) {
     User user = userMapper.toEntity(dto);
     return userMapper.toDto(userRepository.save(user));
   }
 
   @Override
-  public UserDto getById(Long id) {
+  public UserResponseDto getById(Long id) {
     return userRepository.findById(id)
             .map(userMapper::toDto)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(id));
   }
 
   @Override
-  public Page<UserDto> getAll(UserFilter filter, Pageable pageable) {
+  public Page<UserResponseDto> getAll(UserFilter filter, Pageable pageable) {
     return userRepository.findAll(
             userSpecification.build(filter),
             pageable
@@ -49,9 +50,9 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public UserDto update(Long id, UserUpdateDto dto) {
+  public UserResponseDto update(Long id, UserUpdateDto dto) {
     User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(id));
     userMapper.updateEntityFromDto(dto, user);
     return userMapper.toDto(userRepository.save(user));
   }
@@ -60,7 +61,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void activate(Long id) {
     User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(id));
     user.setActive(true);
   }
 
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void deactivate(Long id) {
     User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new UserNotFoundException(id));
     user.setActive(false);
   }
 
@@ -77,5 +78,4 @@ public class UserServiceImpl implements UserService {
   public void delete(Long id) {
     userRepository.deleteById(id);
   }
-
 }

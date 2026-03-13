@@ -2,7 +2,7 @@ package com.example.userservice.dto;
 
 import java.time.LocalDate;
 
-public record PaymentCardDto(
+public record PaymentCardResponseDto(
         Long id,
         String cardNumber,
         String cardHolder,

@@ -1,7 +1,7 @@
 package com.example.userservice.mapper;
 
 import com.example.userservice.dto.PaymentCardCreateDto;
-import com.example.userservice.dto.PaymentCardDto;
+import com.example.userservice.dto.PaymentCardResponseDto;
 import com.example.userservice.dto.PaymentCardUpdateDto;
 import com.example.userservice.entity.PaymentCard;
 import org.mapstruct.Mapper;
@@ -11,7 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface PaymentCardMapper {
 
-  PaymentCardDto toDto(PaymentCard entity);
+  PaymentCardResponseDto toDto(PaymentCard entity);
 
   PaymentCard toEntity(PaymentCardCreateDto dto);
 
