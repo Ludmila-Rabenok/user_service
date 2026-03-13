@@ -19,11 +19,11 @@ public class PaymentCardSpecification {
     return spec;
   }
 
-  public Specification<PaymentCard> hasUserFirstName(String firstName) {
+  public Specification<PaymentCard> hasUserFirstName(String name) {
     return (root, query, cb) ->
             cb.like(
-                    cb.lower(root.join("user").get("firstName")),
-                    "%" + firstName.toLowerCase() + "%"
+                    cb.lower(root.join("user").get("name")),
+                    "%" + name.toLowerCase() + "%"
             );
   }
 

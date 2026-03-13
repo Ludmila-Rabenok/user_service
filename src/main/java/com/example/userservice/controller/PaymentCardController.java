@@ -11,12 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -37,6 +40,11 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.getById(id));
   }
 
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<List<PaymentCardResponseDto>> getByUserId(@PathVariable Long userId) {
+    return ResponseEntity.ok(cardService.getByUserId(userId));
+  }
+
   @PostMapping
   public ResponseEntity<PaymentCardResponseDto> create(@RequestBody PaymentCardCreateDto dto) {
     PaymentCardResponseDto created = cardService.create(dto);
@@ -52,6 +60,18 @@ public class PaymentCardController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     cardService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PatchMapping("/{id}/activate")
+  public ResponseEntity<Void> activate(@PathVariable Long id) {
+    cardService.activate(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PatchMapping("/{id}/deactivate")
+  public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+    cardService.deactivate(id);
     return ResponseEntity.noContent().build();
   }
 }

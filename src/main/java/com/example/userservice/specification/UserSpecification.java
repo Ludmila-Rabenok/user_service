@@ -11,7 +11,7 @@ public class UserSpecification {
   public Specification<User> build(UserFilter filter) {
     Specification<User> spec = (root, query, cb) -> cb.conjunction();
     if (filter.name() != null && !filter.name().isBlank()) {
-      spec = spec.and(hasFirstName(filter.name()));
+      spec = spec.and(hasName(filter.name()));
     }
     if (filter.surname() != null && !filter.surname().isBlank()) {
       spec = spec.and(hasSurname(filter.surname()));
@@ -19,9 +19,9 @@ public class UserSpecification {
     return spec;
   }
 
-  public Specification<User> hasFirstName(String firstName) {
+  public Specification<User> hasName(String name) {
     return (root, query, cb) ->
-            cb.like(cb.lower(root.get("firstName")), "%" + firstName.toLowerCase() + "%");
+            cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%");
   }
 
   public Specification<User> hasSurname(String surname) {

@@ -37,12 +37,12 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   @Override
   @Transactional
-  public PaymentCardResponseDto create(Long userId, PaymentCardCreateDto dto) {
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
-    long cardCount = cardRepository.countByUserId(userId);
+  public PaymentCardResponseDto create(PaymentCardCreateDto dto) {
+    User user = userRepository.findById(dto.userId())
+            .orElseThrow(() -> new UserNotFoundException(dto.userId()));
+    long cardCount = cardRepository.countByUserId(dto.userId());
     if (cardCount >= 5) {
-      throw new CardLimitExceededException(userId);
+      throw new CardLimitExceededException(dto.userId());
     }
     PaymentCard card = cardMapper.toEntity(dto);
     card.setUser(user);

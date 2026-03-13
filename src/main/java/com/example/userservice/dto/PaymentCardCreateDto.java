@@ -8,11 +8,14 @@ import java.time.LocalDate;
 
 public record PaymentCardCreateDto(
         @NotBlank
-        @Size(min = 16, max = 16)
-        String cardNumber,
+        Long userId,
 
         @NotBlank
-        String cardHolder,
+        @Size(min = 16, max = 16)
+        String number,
+
+        @NotBlank
+        String holder,
 
         @NotNull
         LocalDate expirationDate) {

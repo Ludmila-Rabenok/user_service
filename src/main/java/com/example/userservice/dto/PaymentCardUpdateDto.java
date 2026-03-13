@@ -9,13 +9,10 @@ import java.time.LocalDate;
 public record PaymentCardUpdateDto(
         @NotBlank
         @Size(min = 16, max = 16)
-        String cardNumber,
-
+        String number,
         @NotBlank
-        String cardHolder,
-
+        String holder,
         @NotNull
         LocalDate expirationDate,
-
         Boolean active) {
 }
