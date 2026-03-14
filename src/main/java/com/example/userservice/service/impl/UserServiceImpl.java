@@ -1,36 +1,55 @@
 package com.example.userservice.service.impl;
 
-import com.example.userservice.dto.UserCreateDto;
-import com.example.userservice.dto.UserResponseDto;
-import com.example.userservice.dto.UserUpdateDto;
 import com.example.userservice.dto.filter.UserFilter;
+import com.example.userservice.dto.user.UserCreateDto;
+import com.example.userservice.dto.user.UserResponseDto;
+import com.example.userservice.dto.user.UserUpdateDto;
+import com.example.userservice.dto.user.UserWithCardsResponseDto;
+import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
+import com.example.userservice.repository.PaymentCardRepository;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.service.UserService;
 import com.example.userservice.specification.UserSpecification;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final UserSpecification userSpecification;
   private final UserMapper userMapper;
+  private final PaymentCardRepository cardRepository;
 
-  public UserServiceImpl(UserRepository userRepository, UserSpecification userSpecification, UserMapper userMapper) {
+  public UserServiceImpl(UserRepository userRepository, UserSpecification userSpecification, UserMapper userMapper, PaymentCardRepository cardRepository) {
     this.userRepository = userRepository;
     this.userSpecification = userSpecification;
     this.userMapper = userMapper;
+    this.cardRepository = cardRepository;
   }
 
   @Override
   public UserResponseDto create(UserCreateDto dto) {
     User user = userMapper.toEntity(dto);
     return userMapper.toDto(userRepository.save(user));
+  }
+
+  @Override
+  @Transactional
+  @Cacheable(value = "userWithCards", key = "#userId")
+  public UserWithCardsResponseDto getUserWithCards(Long userId) {
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+    List<PaymentCard> cards = cardRepository.findCardsByUserId(userId);
+    return userMapper.toUserWithCardsDto(user, cards);
   }
 
   @Override
@@ -50,6 +69,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "userWithCards", key = "#id")
   public UserResponseDto update(Long id, UserUpdateDto dto) {
     User user = userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
@@ -59,6 +79,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "userWithCards", key = "#id")
   public void activate(Long id) {
     if (!userRepository.existsById(id)) {
       throw new UserNotFoundException(id);
@@ -68,6 +89,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "userWithCards", key = "#id")
   public void deactivate(Long id) {
     if (!userRepository.existsById(id)) {
       throw new UserNotFoundException(id);
@@ -77,8 +99,11 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "userWithCards", key = "#id")
   public void delete(Long id) {
+    if (!userRepository.existsById(id)) {
+      throw new UserNotFoundException(id);
+    }
     userRepository.deleteById(id);
   }
-
 }

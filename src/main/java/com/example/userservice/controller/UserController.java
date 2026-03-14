@@ -1,9 +1,10 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dto.UserCreateDto;
-import com.example.userservice.dto.UserResponseDto;
-import com.example.userservice.dto.UserUpdateDto;
+import com.example.userservice.dto.user.UserCreateDto;
+import com.example.userservice.dto.user.UserResponseDto;
+import com.example.userservice.dto.user.UserUpdateDto;
 import com.example.userservice.dto.filter.UserFilter;
+import com.example.userservice.dto.user.UserWithCardsResponseDto;
 import com.example.userservice.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +33,11 @@ public class UserController {
   public ResponseEntity<Page<UserResponseDto>> getAll(UserFilter filter, Pageable pageable) {
     return ResponseEntity.ok(userService.getAll(filter, pageable));
   }
+  @GetMapping("/{id}/with-cards")
+  public ResponseEntity<UserWithCardsResponseDto> getUserWithCards(@PathVariable Long id) {
+    UserWithCardsResponseDto dto = userService.getUserWithCards(id);
+    return ResponseEntity.ok(dto);
+  }
 
   @GetMapping("/{id}")
   public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
@@ -51,20 +57,20 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
+  public ResponseEntity<String> delete(@PathVariable Long id) {
     userService.delete(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok("Пользователь с id " + id + " удален");
   }
 
   @PatchMapping("/{id}/activate")
-  public ResponseEntity<Void> activate(@PathVariable Long id) {
+  public ResponseEntity<String> activate(@PathVariable Long id) {
     userService.activate(id);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok("Пользователь с id " + id + " активирован");
   }
 
   @PatchMapping("/{id}/deactivate")
-  public ResponseEntity<Void> deactivate(@PathVariable Long id) {
+  public ResponseEntity<String> deactivate(@PathVariable Long id) {
     userService.deactivate(id);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok("Пользователь с id " + id + " деактивирован");
   }
 }

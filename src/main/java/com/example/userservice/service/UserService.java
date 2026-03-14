@@ -1,14 +1,17 @@
 package com.example.userservice.service;
 
-import com.example.userservice.dto.UserCreateDto;
-import com.example.userservice.dto.UserResponseDto;
-import com.example.userservice.dto.UserUpdateDto;
+import com.example.userservice.dto.user.UserCreateDto;
+import com.example.userservice.dto.user.UserResponseDto;
+import com.example.userservice.dto.user.UserUpdateDto;
 import com.example.userservice.dto.filter.UserFilter;
+import com.example.userservice.dto.user.UserWithCardsResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
   UserResponseDto create(UserCreateDto userCreateDto);
+
+  UserWithCardsResponseDto getUserWithCards(Long userId);
 
   UserResponseDto getById(Long id);
 

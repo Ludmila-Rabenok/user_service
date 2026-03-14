@@ -1,8 +1,8 @@
 package com.example.userservice.controller;
 
-import com.example.userservice.dto.PaymentCardCreateDto;
-import com.example.userservice.dto.PaymentCardResponseDto;
-import com.example.userservice.dto.PaymentCardUpdateDto;
+import com.example.userservice.dto.paymentCard.PaymentCardCreateDto;
+import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentCard.PaymentCardUpdateDto;
 import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.service.PaymentCardService;
 import org.springframework.data.domain.Page;
@@ -58,20 +58,20 @@ public class PaymentCardController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
-    cardService.delete(id);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<String> delete(@PathVariable Long id) {
+    Long userId = cardService.delete(id);
+    return ResponseEntity.ok("Карта пользователя с id " + userId + " удалена");
   }
 
   @PatchMapping("/{id}/activate")
-  public ResponseEntity<Void> activate(@PathVariable Long id) {
-    cardService.activate(id);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<String> activate(@PathVariable Long id) {
+    Long userId = cardService.activate(id);
+    return ResponseEntity.ok("Карта пользователя с id " + userId + " активирована");
   }
 
   @PatchMapping("/{id}/deactivate")
-  public ResponseEntity<Void> deactivate(@PathVariable Long id) {
-    cardService.deactivate(id);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<String> deactivate(@PathVariable Long id) {
+    Long userId = cardService.deactivate(id);
+    return ResponseEntity.ok("Карта пользователя с id " + userId + " деактивирована");
   }
 }
