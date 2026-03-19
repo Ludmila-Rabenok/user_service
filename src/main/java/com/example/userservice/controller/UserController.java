@@ -1,16 +1,14 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.dto.filter.UserFilter;
 import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
-import com.example.userservice.dto.filter.UserFilter;
-import com.example.userservice.dto.user.UserWithCardsResponseDto;
 import com.example.userservice.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,11 +31,6 @@ public class UserController {
   public ResponseEntity<Page<UserResponseDto>> getAll(UserFilter filter, Pageable pageable) {
     return ResponseEntity.ok(userService.getAll(filter, pageable));
   }
-  @GetMapping("/{id}/with-cards")
-  public ResponseEntity<UserWithCardsResponseDto> getUserWithCards(@PathVariable Long id) {
-    UserWithCardsResponseDto dto = userService.getUserWithCards(id);
-    return ResponseEntity.ok(dto);
-  }
 
   @GetMapping("/{id}")
   public ResponseEntity<UserResponseDto> getById(@PathVariable Long id) {
@@ -54,12 +47,6 @@ public class UserController {
   public ResponseEntity<UserResponseDto> update(@PathVariable Long id,
                                                 @RequestBody UserUpdateDto dto) {
     return ResponseEntity.ok(userService.update(id, dto));
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<String> delete(@PathVariable Long id) {
-    userService.delete(id);
-    return ResponseEntity.ok("Пользователь с id " + id + " удален");
   }
 
   @PatchMapping("/{id}/activate")

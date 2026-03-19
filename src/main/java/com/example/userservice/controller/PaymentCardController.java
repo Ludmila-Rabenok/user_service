@@ -57,12 +57,6 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.update(id, dto));
   }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<String> delete(@PathVariable Long id) {
-    Long userId = cardService.delete(id);
-    return ResponseEntity.ok("Карта пользователя с id " + userId + " удалена");
-  }
-
   @PatchMapping("/{id}/activate")
   public ResponseEntity<String> activate(@PathVariable Long id) {
     Long userId = cardService.activate(id);

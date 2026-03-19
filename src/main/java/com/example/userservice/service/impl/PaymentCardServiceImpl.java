@@ -7,6 +7,7 @@ import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.CardLimitExceededException;
+import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.PaymentCardMapper;
@@ -40,7 +41,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#dto.userId()")
   public PaymentCardResponseDto create(PaymentCardCreateDto dto) {
-    User user = userRepository.findById(dto.userId())
+    User user = userRepository.findByIdForUpdate(dto.userId())
             .orElseThrow(() -> new UserNotFoundException(dto.userId()));
     long cardCount = cardRepository.countByUserId(dto.userId());
     if (cardCount >= 5) {
@@ -88,35 +89,23 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#result")
   public Long activate(Long id) {
-    if (!cardRepository.existsById(id)) {
-      throw new PaymentCardNotFoundException(id);
+    PaymentCard card = cardRepository.findById(id)
+            .orElseThrow(() -> new PaymentCardNotFoundException(id));
+    if (!card.getUser().isActive()) {
+      throw new InactiveUserException(card.getUser().getId());
     }
-    Long userId = cardRepository.findUserIdByCardId(id);
-    cardRepository.updateActiveStatus(id, true);
-    return userId;
+    card.setActive(true);
+    return card.getUser().getId();
   }
 
   @Override
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#result")
   public Long deactivate(Long id) {
-    if (!cardRepository.existsById(id)) {
-      throw new PaymentCardNotFoundException(id);
-    }
-    Long userId = cardRepository.findUserIdByCardId(id);
-    cardRepository.updateActiveStatus(id, false);
-    return userId;
+    PaymentCard card = cardRepository.findById(id)
+            .orElseThrow(() -> new PaymentCardNotFoundException(id));
+    card.setActive(false);
+    return card.getUser().getId();
   }
 
-  @Override
-  @Transactional
-  @CacheEvict(value = "userWithCards", key = "#result")
-  public Long delete(Long id) {
-    Long userId = cardRepository.findUserIdByCardId(id);
-    if (userId == null) {
-      throw new PaymentCardNotFoundException(id);
-    }
-    cardRepository.deleteById(id);
-    return userId;
-  }
 }

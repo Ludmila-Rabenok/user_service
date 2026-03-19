@@ -2,6 +2,7 @@ package com.example.userservice.exception.handler;
 
 import com.example.userservice.dto.error.ErrorResponse;
 import com.example.userservice.exception.CardLimitExceededException;
+import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
 import com.example.userservice.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(CardLimitExceededException.class)
   public ResponseEntity<?> handleCardLimit(CardLimitExceededException e) {
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(e.getMessage()));
+  }
+  @ExceptionHandler(InactiveUserException.class)
+  public ResponseEntity<?> handleInactiveUser(InactiveUserException e){
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(e.getMessage()));

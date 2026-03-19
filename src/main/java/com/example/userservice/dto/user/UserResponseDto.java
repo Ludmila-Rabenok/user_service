@@ -1,6 +1,9 @@
 package com.example.userservice.dto.user;
 
+import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public record UserResponseDto(
         Long id,
@@ -8,5 +11,6 @@ public record UserResponseDto(
         String surname,
         LocalDate birthDate,
         String email,
-        Boolean active) {
+        Boolean active,
+        List<PaymentCardResponseDto> cards) {
 }

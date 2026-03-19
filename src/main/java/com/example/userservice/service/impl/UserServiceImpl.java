@@ -4,8 +4,6 @@ import com.example.userservice.dto.filter.UserFilter;
 import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
-import com.example.userservice.dto.user.UserWithCardsResponseDto;
-import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
@@ -17,10 +15,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -43,28 +40,18 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Transactional
   @Cacheable(value = "userWithCards", key = "#userId")
-  public UserWithCardsResponseDto getUserWithCards(Long userId) {
+  public UserResponseDto getById(Long userId) {
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
-    List<PaymentCard> cards = cardRepository.findCardsByUserId(userId);
-    return userMapper.toUserWithCardsDto(user, cards);
-  }
-
-  @Override
-  public UserResponseDto getById(Long id) {
-    return userRepository.findById(id)
-            .map(userMapper::toDto)
-            .orElseThrow(() -> new UserNotFoundException(id));
+    return userMapper.toDto(user);
   }
 
   @Override
   public Page<UserResponseDto> getAll(UserFilter filter, Pageable pageable) {
-    return userRepository.findAll(
-            userSpecification.build(filter),
-            pageable
-    ).map(userMapper::toDto);
+    Specification<User> spec = userSpecification.build(filter);
+    return userRepository.findAll(spec, pageable)
+            .map(userMapper::toDto);
   }
 
   @Override
@@ -81,29 +68,20 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#id")
   public void activate(Long id) {
-    if (!userRepository.existsById(id)) {
+    int updated = userRepository.updateActiveStatus(id, true);
+    if (updated == 0) {
       throw new UserNotFoundException(id);
     }
-    userRepository.updateActiveStatus(id, true);
   }
 
   @Override
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#id")
   public void deactivate(Long id) {
-    if (!userRepository.existsById(id)) {
+    int updated = userRepository.updateActiveStatus(id, false);
+    if (updated == 0) {
       throw new UserNotFoundException(id);
     }
-    userRepository.updateActiveStatus(id, false);
-  }
-
-  @Override
-  @Transactional
-  @CacheEvict(value = "userWithCards", key = "#id")
-  public void delete(Long id) {
-    if (!userRepository.existsById(id)) {
-      throw new UserNotFoundException(id);
-    }
-    userRepository.deleteById(id);
+    cardRepository.updateActiveStatusByUserId(id, false);
   }
 }

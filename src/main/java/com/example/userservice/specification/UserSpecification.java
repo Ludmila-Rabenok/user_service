@@ -16,6 +16,9 @@ public class UserSpecification {
     if (filter.surname() != null && !filter.surname().isBlank()) {
       spec = spec.and(hasSurname(filter.surname()));
     }
+    if (filter.active() != null) {
+      spec = spec.and(isActive(filter.active()));
+    }
     return spec;
   }
 
@@ -29,4 +32,8 @@ public class UserSpecification {
             cb.like(cb.lower(root.get("surname")), "%" + surname.toLowerCase() + "%");
   }
 
+  public Specification<User> isActive(Boolean active) {
+    return (root, query, cb) ->
+            cb.equal(root.get("active"), active);
+  }
 }

@@ -24,6 +24,4 @@ public interface PaymentCardService {
 
   Long deactivate(Long id);
 
-  Long delete(Long id);
-
 }

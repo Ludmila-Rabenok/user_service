@@ -8,11 +8,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring",  uses = PaymentCardMapper.class)
+import java.util.List;
+
+@Mapper(componentModel = "spring")
 public interface PaymentCardMapper {
 
   @Mapping(target = "userId", source = "user.id")
   PaymentCardResponseDto toDto(PaymentCard entity);
+
+  List<PaymentCardResponseDto> toDtoList(List<PaymentCard> cards);
 
   PaymentCard toEntity(PaymentCardCreateDto dto);
 
