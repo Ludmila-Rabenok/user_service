@@ -5,6 +5,7 @@ import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
 import com.example.userservice.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -38,14 +39,14 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<UserResponseDto> create(@RequestBody UserCreateDto dto) {
+  public ResponseEntity<UserResponseDto> create(@Valid @RequestBody UserCreateDto dto) {
     UserResponseDto created = userService.create(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(created);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<UserResponseDto> update(@PathVariable Long id,
-                                                @RequestBody UserUpdateDto dto) {
+                                                @Valid @RequestBody UserUpdateDto dto) {
     return ResponseEntity.ok(userService.update(id, dto));
   }
 

@@ -5,6 +5,7 @@ import com.example.userservice.exception.CardLimitExceededException;
 import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
 import com.example.userservice.exception.UserNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,6 +37,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<?> handleInactiveUser(InactiveUserException e){
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(e.getMessage()));
+  }
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException e){
+    return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(new ErrorResponse(e.getMessage()));
   }
 

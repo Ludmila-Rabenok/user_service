@@ -5,6 +5,7 @@ import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
 import com.example.userservice.dto.paymentCard.PaymentCardUpdateDto;
 import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.service.PaymentCardService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -46,14 +47,14 @@ public class PaymentCardController {
   }
 
   @PostMapping
-  public ResponseEntity<PaymentCardResponseDto> create(@RequestBody PaymentCardCreateDto dto) {
+  public ResponseEntity<PaymentCardResponseDto> create(@Valid @RequestBody PaymentCardCreateDto dto) {
     PaymentCardResponseDto created = cardService.create(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(created);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<PaymentCardResponseDto> update(@PathVariable Long id,
-                                                       @RequestBody PaymentCardUpdateDto dto) {
+                                                       @Valid @RequestBody PaymentCardUpdateDto dto) {
     return ResponseEntity.ok(cardService.update(id, dto));
   }
 

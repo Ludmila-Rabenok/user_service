@@ -5,6 +5,7 @@ import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
 import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
+import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
@@ -26,7 +27,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -130,16 +135,19 @@ class UserServiceImplTest {
 
   @Test
   void activate_ShouldUpdateStatus() {
-    when(userRepository.updateActiveStatus(1L, true)).thenReturn(1);
+    User user = new User();
+    user.setActive(false);
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
     userService.activate(1L);
 
-    verify(userRepository).updateActiveStatus(1L, true);
+    assertTrue(user.isActive());
+    verify(userRepository).findById(1L);
   }
 
   @Test
   void activate_ShouldThrow_WhenNotFound() {
-    when(userRepository.updateActiveStatus(1L, true)).thenReturn(0);
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
             () -> userService.activate(1L));
@@ -147,18 +155,23 @@ class UserServiceImplTest {
 
   @Test
   void deactivate_ShouldUpdateStatus() {
-    when(userRepository.updateActiveStatus(1L, false)).thenReturn(1);
-    when(cardRepository.updateActiveStatusByUserId(1L, false)).thenReturn(1);
+    User user = new User();
+    user.setActive(true);
+    PaymentCard card = new PaymentCard();
+    card.setActive(true);
+    user.setCards(List.of(card));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
     userService.deactivate(1L);
 
-    verify(userRepository).updateActiveStatus(1L, false);
-    verify(cardRepository).updateActiveStatusByUserId(1L, false);
+    assertFalse(user.isActive());
+    assertFalse(user.getCards().get(0).isActive());
+    verify(userRepository).findById(1L);
   }
 
   @Test
   void deactivate_ShouldThrow_WhenNotFound() {
-    when(userRepository.updateActiveStatus(1L, false)).thenReturn(0);
+    when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
             () -> userService.deactivate(1L));

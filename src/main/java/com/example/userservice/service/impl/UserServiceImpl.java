@@ -24,13 +24,11 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final UserSpecification userSpecification;
   private final UserMapper userMapper;
-  private final PaymentCardRepository cardRepository;
 
-  public UserServiceImpl(UserRepository userRepository, UserSpecification userSpecification, UserMapper userMapper, PaymentCardRepository cardRepository) {
+  public UserServiceImpl(UserRepository userRepository, UserSpecification userSpecification, UserMapper userMapper) {
     this.userRepository = userRepository;
     this.userSpecification = userSpecification;
     this.userMapper = userMapper;
-    this.cardRepository = cardRepository;
   }
 
   @Override
@@ -68,20 +66,16 @@ public class UserServiceImpl implements UserService {
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#id")
   public void activate(Long id) {
-    int updated = userRepository.updateActiveStatus(id, true);
-    if (updated == 0) {
-      throw new UserNotFoundException(id);
-    }
+    User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    user.setActive(true);
   }
 
   @Override
   @Transactional
   @CacheEvict(value = "userWithCards", key = "#id")
   public void deactivate(Long id) {
-    int updated = userRepository.updateActiveStatus(id, false);
-    if (updated == 0) {
-      throw new UserNotFoundException(id);
-    }
-    cardRepository.updateActiveStatusByUserId(id, false);
+    User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
+    user.setActive(false);
+    user.getCards().forEach(c -> c.setActive(false));
   }
 }

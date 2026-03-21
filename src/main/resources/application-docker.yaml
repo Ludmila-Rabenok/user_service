@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/user_card
-    username: user
-    password: password
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   liquibase:
@@ -16,9 +16,9 @@ spring:
       hibernate:
         format_sql: true
 
-  redis:
-    host: redis
-    port: 6379
-
-  cache:
-    type: redis
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
+    cache:
+      type: redis

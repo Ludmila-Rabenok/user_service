@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record PaymentCardCreateDto(
-        @NotBlank
+        @NotNull
         Long userId,
 
         @NotBlank
