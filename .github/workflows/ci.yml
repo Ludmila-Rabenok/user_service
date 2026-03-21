@@ -21,6 +21,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
 
       - name: Enable Docker for Testcontainers
         run: |
@@ -40,3 +41,9 @@ jobs:
            -Dsonar.host.url=https://sonarcloud.io \
            -Dsonar.login=$SONAR_TOKEN \
            -Dsonar.java.binaries=target/classes
+
+      - name: Package JAR
+        run: mvn -B package -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t user-service:latest .
