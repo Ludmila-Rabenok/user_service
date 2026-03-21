@@ -22,5 +22,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Enable Docker for Testcontainers
+        run: |
+          sudo systemctl start docker
+          docker info
+
       - name: Build with Maven
-        run: mvn -B clean install -DskipTests
+        run: mvn -B clean install
