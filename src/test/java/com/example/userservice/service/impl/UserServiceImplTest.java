@@ -1,7 +1,7 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.dto.filter.UserFilter;
-import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentсard.PaymentCardResponseDto;
 import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
@@ -9,7 +9,6 @@ import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
-import com.example.userservice.repository.PaymentCardRepository;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.specification.UserSpecification;
 import org.junit.jupiter.api.Test;
@@ -47,9 +46,6 @@ class UserServiceImplTest {
 
   @Mock
   private UserMapper userMapper;
-
-  @Mock
-  private PaymentCardRepository cardRepository;
 
   @InjectMocks
   private UserServiceImpl userService;

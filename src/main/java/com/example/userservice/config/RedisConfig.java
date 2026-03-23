@@ -24,7 +24,7 @@ public class RedisConfig {
     PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
             .allowIfBaseType(Object.class)
             .build();
-    mapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.EVERYTHING, JsonTypeInfo.As.PROPERTY);
+    mapper.activateDefaultTyping(ptv, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
     return RedisCacheConfiguration.defaultCacheConfig()
             .serializeValuesWith(
                     RedisSerializationContext.SerializationPair.fromSerializer(

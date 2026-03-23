@@ -1,4 +1,4 @@
-package com.example.userservice.dto.paymentCard;
+package com.example.userservice.dto.paymentсard;
 
 import java.time.LocalDate;
 

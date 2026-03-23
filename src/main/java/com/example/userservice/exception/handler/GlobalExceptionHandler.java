@@ -14,39 +14,39 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
   @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<?> handleUserNotFound(UserNotFoundException e) {
+  public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException e) {
     return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(new ErrorResponse(e.getMessage()));
   }
 
   @ExceptionHandler(PaymentCardNotFoundException.class)
-  public ResponseEntity<?> handleCardNotFound(PaymentCardNotFoundException e) {
+  public ResponseEntity<ErrorResponse> handleCardNotFound(PaymentCardNotFoundException e) {
     return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(new ErrorResponse(e.getMessage()));
   }
 
   @ExceptionHandler(CardLimitExceededException.class)
-  public ResponseEntity<?> handleCardLimit(CardLimitExceededException e) {
+  public ResponseEntity<ErrorResponse> handleCardLimit(CardLimitExceededException e) {
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(e.getMessage()));
   }
   @ExceptionHandler(InactiveUserException.class)
-  public ResponseEntity<?> handleInactiveUser(InactiveUserException e){
+  public ResponseEntity<ErrorResponse> handleInactiveUser(InactiveUserException e){
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(e.getMessage()));
   }
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<?> handleDataIntegrityViolation(DataIntegrityViolationException e){
+  public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException e){
     return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(new ErrorResponse(e.getMessage()));
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<?> handleGeneral(Exception e) {
+  public ResponseEntity<ErrorResponse> handleGeneral(Exception e) {
     return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(new ErrorResponse("Unexpected error: " + e.getMessage()));

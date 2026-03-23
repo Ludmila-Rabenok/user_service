@@ -1,7 +1,7 @@
 package com.example.userservice.integration.controller;
 
-import com.example.userservice.dto.paymentCard.PaymentCardCreateDto;
-import com.example.userservice.dto.paymentCard.PaymentCardUpdateDto;
+import com.example.userservice.dto.paymentсard.PaymentCardCreateDto;
+import com.example.userservice.dto.paymentсard.PaymentCardUpdateDto;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.integration.AbstractIntegrationTest;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-public class PaymentCardControllerIT extends AbstractIntegrationTest {
+class PaymentCardControllerIT extends AbstractIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;

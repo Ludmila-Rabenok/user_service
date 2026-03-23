@@ -1,8 +1,8 @@
 package com.example.userservice.service;
 
-import com.example.userservice.dto.paymentCard.PaymentCardCreateDto;
-import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
-import com.example.userservice.dto.paymentCard.PaymentCardUpdateDto;
+import com.example.userservice.dto.paymentсard.PaymentCardCreateDto;
+import com.example.userservice.dto.paymentсard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentсard.PaymentCardUpdateDto;
 import com.example.userservice.dto.filter.PaymentCardFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

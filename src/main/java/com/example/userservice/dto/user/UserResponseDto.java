@@ -1,6 +1,6 @@
 package com.example.userservice.dto.user;
 
-import com.example.userservice.dto.paymentCard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentсard.PaymentCardResponseDto;
 
 import java.time.LocalDate;
 import java.util.List;
