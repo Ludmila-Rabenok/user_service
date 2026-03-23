@@ -123,10 +123,11 @@ class UserServiceImplTest {
 
   @Test
   void update_ShouldThrow_WhenNotFound() {
+    UserUpdateDto updateDto = buildUpdateDto();
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
-            () -> userService.update(1L, buildUpdateDto()));
+            () -> userService.update(1L, updateDto));
   }
 
   @Test

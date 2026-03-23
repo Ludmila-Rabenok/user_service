@@ -159,10 +159,11 @@ class PaymentCardServiceImplTest {
 
   @Test
   void update_ShouldThrow_WhenNotFound() {
+    PaymentCardUpdateDto updateDto = buildUpdateDto();
     when(cardRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(PaymentCardNotFoundException.class,
-            () -> cardService.update(1L, buildUpdateDto()));
+            () -> cardService.update(1L, updateDto));
   }
 
   @Test
