@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/01-create-users.yaml
+  - include:
+      file: db/changelog/02-create-payment-cards.yaml
+  - include:
+      file: db/changelog/03-add-indexes.yaml
