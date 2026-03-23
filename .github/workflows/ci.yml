@@ -37,7 +37,7 @@ jobs:
         run: |
           mvn sonar:sonar \
             -Dsonar.projectKey=Ludmila-Rabenok_user_service \
-            -Dsonar.organization=ludmila-rabenok89 \
+            -Dsonar.organization=ludmila-rabenok \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN \
             -Dsonar.java.binaries=target/classes
