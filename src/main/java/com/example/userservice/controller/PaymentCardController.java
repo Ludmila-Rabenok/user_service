@@ -1,9 +1,9 @@
 package com.example.userservice.controller;
 
 import com.example.userservice.dto.filter.PaymentCardFilter;
-import com.example.userservice.dto.paymentсard.PaymentCardCreateDto;
-import com.example.userservice.dto.paymentсard.PaymentCardResponseDto;
-import com.example.userservice.dto.paymentсard.PaymentCardUpdateDto;
+import com.example.userservice.dto.paymentcard.PaymentCardCreateDto;
+import com.example.userservice.dto.paymentcard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentcard.PaymentCardUpdateDto;
 import com.example.userservice.service.PaymentCardService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

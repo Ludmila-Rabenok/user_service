@@ -1,9 +1,9 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.dto.filter.PaymentCardFilter;
-import com.example.userservice.dto.paymentсard.PaymentCardCreateDto;
-import com.example.userservice.dto.paymentсard.PaymentCardResponseDto;
-import com.example.userservice.dto.paymentсard.PaymentCardUpdateDto;
+import com.example.userservice.dto.paymentcard.PaymentCardCreateDto;
+import com.example.userservice.dto.paymentcard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentcard.PaymentCardUpdateDto;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.CardLimitExceededException;

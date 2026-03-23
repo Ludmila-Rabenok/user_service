@@ -1,7 +1,7 @@
 package com.example.userservice.service.impl;
 
 import com.example.userservice.dto.filter.UserFilter;
-import com.example.userservice.dto.paymentсard.PaymentCardResponseDto;
+import com.example.userservice.dto.paymentcard.PaymentCardResponseDto;
 import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;

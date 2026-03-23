@@ -1,7 +1,7 @@
 package com.example.userservice.integration;
 
-import com.example.userservice.dto.paymentсard.PaymentCardCreateDto;
-import com.example.userservice.dto.paymentсard.PaymentCardUpdateDto;
+import com.example.userservice.dto.paymentcard.PaymentCardCreateDto;
+import com.example.userservice.dto.paymentcard.PaymentCardUpdateDto;
 import com.example.userservice.dto.user.UserCreateDto;
 import com.example.userservice.dto.user.UserUpdateDto;
 import com.example.userservice.entity.PaymentCard;
