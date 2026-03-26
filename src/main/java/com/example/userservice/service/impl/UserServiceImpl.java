@@ -9,6 +9,7 @@ import com.example.userservice.exception.AccessDeniedException;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.repository.UserRepository;
+import com.example.userservice.security.CurrentUserProvider;
 import com.example.userservice.service.UserService;
 import com.example.userservice.specification.UserSpecification;
 import org.springframework.cache.annotation.CacheEvict;
@@ -16,7 +17,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,11 +25,13 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final UserSpecification userSpecification;
   private final UserMapper userMapper;
+  private final CurrentUserProvider currentUserProvider;
 
-  public UserServiceImpl(UserRepository userRepository, UserSpecification userSpecification, UserMapper userMapper) {
+  public UserServiceImpl(UserRepository userRepository, UserSpecification userSpecification, UserMapper userMapper, CurrentUserProvider currentUserProvider) {
     this.userRepository = userRepository;
     this.userSpecification = userSpecification;
     this.userMapper = userMapper;
+    this.currentUserProvider = currentUserProvider;
   }
 
   @Override
@@ -41,8 +43,8 @@ public class UserServiceImpl implements UserService {
   @Override
   @Cacheable(value = "userWithCards", key = "#userId")
   public UserResponseDto getById(Long userId) {
-    Long currentUserId = getCurrentUserId();
-    String role = getCurrentRole();
+    Long currentUserId = currentUserProvider.getCurrentUserId();
+    String role = currentUserProvider.getCurrentRole();
     if (!role.equals("ROLE_ADMIN") && !currentUserId.equals(userId)) {
       throw new AccessDeniedException();
     }
@@ -83,17 +85,5 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException(id));
     user.setActive(false);
     user.getCards().forEach(c -> c.setActive(false));
-  }
-
-  private Long getCurrentUserId() {
-    return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-  }
-
-  private String getCurrentRole() {
-    return SecurityContextHolder.getContext().getAuthentication()
-            .getAuthorities()
-            .iterator()
-            .next()
-            .getAuthority();
   }
 }

@@ -1,9 +1,9 @@
 package com.example.userservice.service.impl;
 
+import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.dto.paymentcard.PaymentCardCreateDto;
 import com.example.userservice.dto.paymentcard.PaymentCardResponseDto;
 import com.example.userservice.dto.paymentcard.PaymentCardUpdateDto;
-import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
 import com.example.userservice.exception.AccessDeniedException;
@@ -14,12 +14,12 @@ import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.PaymentCardMapper;
 import com.example.userservice.repository.PaymentCardRepository;
 import com.example.userservice.repository.UserRepository;
+import com.example.userservice.security.CurrentUserProvider;
 import com.example.userservice.service.PaymentCardService;
 import com.example.userservice.specification.PaymentCardSpecification;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,12 +31,14 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   private final UserRepository userRepository;
   private final PaymentCardSpecification cardSpecification;
   private final PaymentCardMapper cardMapper;
+  private final CurrentUserProvider currentUserProvider;
 
-  public PaymentCardServiceImpl(PaymentCardRepository cardRepository, UserRepository userRepository, PaymentCardSpecification cardSpecification, PaymentCardMapper cardMapper) {
+  public PaymentCardServiceImpl(PaymentCardRepository cardRepository, UserRepository userRepository, PaymentCardSpecification cardSpecification, PaymentCardMapper cardMapper, CurrentUserProvider currentUserProvider) {
     this.cardRepository = cardRepository;
     this.userRepository = userRepository;
     this.cardSpecification = cardSpecification;
     this.cardMapper = cardMapper;
+    this.currentUserProvider = currentUserProvider;
   }
 
   @Override
@@ -63,8 +65,8 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   @Override
   public List<PaymentCardResponseDto> getByUserId(Long userId) {
-    Long currentUserId = getCurrentUserId();
-    String role = getCurrentRole();
+    Long currentUserId = currentUserProvider.getCurrentUserId();
+    String role = currentUserProvider.getCurrentRole();
     if (!role.equals("ROLE_ADMIN") && !currentUserId.equals(userId)) {
       throw new AccessDeniedException();
     }
@@ -113,17 +115,5 @@ public class PaymentCardServiceImpl implements PaymentCardService {
             .orElseThrow(() -> new PaymentCardNotFoundException(id));
     card.setActive(false);
     return card.getUser().getId();
-  }
-
-  private Long getCurrentUserId() {
-    return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-  }
-
-  private String getCurrentRole() {
-    return SecurityContextHolder.getContext().getAuthentication()
-            .getAuthorities()
-            .iterator()
-            .next()
-            .getAuthority();
   }
 }

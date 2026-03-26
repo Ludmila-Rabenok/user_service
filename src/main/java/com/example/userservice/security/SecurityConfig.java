@@ -26,8 +26,8 @@ public class SecurityConfig {
             .cors(cors -> cors.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(HttpMethod.GET, "/api/users/*").hasAnyRole("USER")
-                    .requestMatchers(HttpMethod.GET, "/api/cards/user/*").hasAnyRole("USER")
+                    .requestMatchers(HttpMethod.GET, "/api/users/*").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/cards/user/*").hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/**").hasRole("ADMIN")
                     .anyRequest().denyAll()
             )
