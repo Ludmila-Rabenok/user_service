@@ -13,8 +13,8 @@ import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.PaymentCardMapper;
 import com.example.userservice.repository.PaymentCardRepository;
 import com.example.userservice.repository.UserRepository;
+import com.example.userservice.security.CurrentUserProvider;
 import com.example.userservice.specification.PaymentCardSpecification;
-import com.example.userservice.util.SecurityTestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,9 +26,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
@@ -53,6 +50,9 @@ class PaymentCardServiceImplTest {
 
   @Mock
   private PaymentCardMapper cardMapper;
+
+  @Mock
+  private CurrentUserProvider provider;
 
   @InjectMocks
   private PaymentCardServiceImpl cardService;
@@ -120,11 +120,12 @@ class PaymentCardServiceImplTest {
 
   @Test
   void getByUserId_adminCanAccessAnyUser() {
-    SecurityTestUtils.mockAuth(99L, "ROLE_ADMIN");
     PaymentCard card = new PaymentCard();
     User user = new User();
     card.setUser(user);
     PaymentCardResponseDto dto = buildResponseDto();
+    when(provider.getCurrentUserId()).thenReturn(99L);
+    when(provider.getCurrentRole()).thenReturn("ROLE_ADMIN");
     when(cardRepository.findCardsByUserId(1L)).thenReturn(List.of(card));
     when(cardMapper.toDto(card)).thenReturn(dto);
 
@@ -138,7 +139,8 @@ class PaymentCardServiceImplTest {
 
   @Test
   void getByUserId_userCanAccessOwnCards() {
-    SecurityTestUtils.mockAuth(1L, "ROLE_USER");
+    when(provider.getCurrentUserId()).thenReturn(1L);
+    when(provider.getCurrentRole()).thenReturn("ROLE_USER");
     PaymentCard card = new PaymentCard();
     PaymentCardResponseDto dto = buildResponseDto();
     when(cardRepository.findCardsByUserId(1L)).thenReturn(List.of(card));
@@ -153,7 +155,8 @@ class PaymentCardServiceImplTest {
 
   @Test
   void getByUserId_userCannotAccessAnotherUsersCards() {
-    SecurityTestUtils.mockAuth(5L, "ROLE_USER");
+    when(provider.getCurrentUserId()).thenReturn(5L);
+    when(provider.getCurrentRole()).thenReturn("ROLE_USER");
 
     assertThrows(AccessDeniedException.class, () -> cardService.getByUserId(1L));
   }
