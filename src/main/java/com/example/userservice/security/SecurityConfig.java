@@ -13,6 +13,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
+  public static final String ADMIN = "ADMIN";
+  public static final String USER = "USER";
+
   private final JwtAuthenticationFilter jwtFilter;
 
   public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
@@ -26,9 +29,9 @@ public class SecurityConfig {
             .cors(cors -> cors.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(HttpMethod.GET, "/api/users/*").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers(HttpMethod.GET, "/api/cards/user/*").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/api/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/api/users/*").hasAnyRole(USER, ADMIN)
+                    .requestMatchers(HttpMethod.GET, "/api/cards/user/*").hasAnyRole(USER, ADMIN)
+                    .requestMatchers("/api/**").hasRole(ADMIN)
                     .anyRequest().denyAll()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
