@@ -1,6 +1,7 @@
 package com.example.userservice.exception.handler;
 
 import com.example.userservice.dto.error.ErrorResponse;
+import com.example.userservice.exception.AccessDeniedException;
 import com.example.userservice.exception.CardLimitExceededException;
 import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
@@ -33,15 +34,23 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(e.getMessage()));
   }
+
   @ExceptionHandler(InactiveUserException.class)
-  public ResponseEntity<ErrorResponse> handleInactiveUser(InactiveUserException e){
+  public ResponseEntity<ErrorResponse> handleInactiveUser(InactiveUserException e) {
     return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(new ErrorResponse(e.getMessage()));
   }
+
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException e){
+  public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException e) {
     return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(new ErrorResponse(e.getMessage()));
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(new ErrorResponse(e.getMessage()));
   }
 

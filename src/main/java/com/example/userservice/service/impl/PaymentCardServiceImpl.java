@@ -6,6 +6,7 @@ import com.example.userservice.dto.paymentcard.PaymentCardUpdateDto;
 import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
+import com.example.userservice.exception.AccessDeniedException;
 import com.example.userservice.exception.CardLimitExceededException;
 import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
@@ -18,6 +19,7 @@ import com.example.userservice.specification.PaymentCardSpecification;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +63,11 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   @Override
   public List<PaymentCardResponseDto> getByUserId(Long userId) {
+    Long currentUserId = getCurrentUserId();
+    String role = getCurrentRole();
+    if (!role.equals("ROLE_ADMIN") && !currentUserId.equals(userId)) {
+      throw new AccessDeniedException();
+    }
     return cardRepository.findCardsByUserId(userId)
             .stream()
             .map(cardMapper::toDto)
@@ -108,4 +115,15 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     return card.getUser().getId();
   }
 
+  private Long getCurrentUserId() {
+    return (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+  }
+
+  private String getCurrentRole() {
+    return SecurityContextHolder.getContext().getAuthentication()
+            .getAuthorities()
+            .iterator()
+            .next()
+            .getAuthority();
+  }
 }

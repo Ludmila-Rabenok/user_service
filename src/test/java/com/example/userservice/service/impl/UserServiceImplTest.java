@@ -7,10 +7,13 @@ import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
+import com.example.userservice.exception.AccessDeniedException;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.specification.UserSpecification;
+import com.example.userservice.util.SecurityTestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,6 +54,11 @@ class UserServiceImplTest {
   @InjectMocks
   private UserServiceImpl userService;
 
+  @AfterEach
+  void clearContext() {
+    SecurityContextHolder.clearContext();
+  }
+
   @Test
   void create_ShouldSaveUserAndReturnDto() {
     UserCreateDto createDto = mock(UserCreateDto.class);
@@ -66,8 +75,10 @@ class UserServiceImplTest {
   }
 
   @Test
-  void getById_ShouldReturnDto() {
+  void getById_adminCanAccessAnyUser() {
+    SecurityTestUtils.mockAuth(99L, "ROLE_ADMIN");
     User user = new User();
+    user.setId(1L);
     UserResponseDto expected = buildUserResponse();
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(userMapper.toDto(user)).thenReturn(expected);
@@ -79,7 +90,30 @@ class UserServiceImplTest {
   }
 
   @Test
+  void getById_userCanAccessOnlySelf() {
+    SecurityTestUtils.mockAuth(1L, "ROLE_USER");
+    User user = new User();
+    UserResponseDto expected = buildUserResponse();
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(userMapper.toDto(user)).thenReturn(expected);
+
+    UserResponseDto actual = userService.getById(1L);
+
+    assertEquals(expected.id(), actual.id());
+    verify(userRepository).findById(1L);
+  }
+
+  @Test
+  void getById_shouldThrowAccessDenied_whenUserNotAccess() {
+    SecurityTestUtils.mockAuth(2L, "ROLE_USER");
+
+    assertThrows(AccessDeniedException.class,
+            () -> userService.getById(1L));
+  }
+
+  @Test
   void getById_ShouldThrow_WhenNotFound() {
+    SecurityTestUtils.mockAuth(1L, "ROLE_USER");
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
