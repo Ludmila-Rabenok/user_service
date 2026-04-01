@@ -5,6 +5,7 @@ import com.example.userservice.exception.AccessDeniedException;
 import com.example.userservice.exception.CardLimitExceededException;
 import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
+import com.example.userservice.exception.UserAlreadyExistsException;
 import com.example.userservice.exception.UserNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,12 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(new ErrorResponse(e.getMessage()));
+  }
+
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException e) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(new ErrorResponse(e.getMessage()));
   }
 
