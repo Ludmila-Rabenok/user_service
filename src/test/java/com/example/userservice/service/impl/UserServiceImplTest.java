@@ -1,5 +1,6 @@
 package com.example.userservice.service.impl;
 
+import com.example.userservice.TestAuthUtil;
 import com.example.userservice.dto.filter.UserFilter;
 import com.example.userservice.dto.paymentcard.PaymentCardResponseDto;
 import com.example.userservice.dto.user.UserCreateDto;
@@ -7,10 +8,12 @@ import com.example.userservice.dto.user.UserResponseDto;
 import com.example.userservice.dto.user.UserUpdateDto;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
+import com.example.userservice.exception.UserAlreadyExistsException;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.UserMapper;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.specification.UserSpecification;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,11 +54,18 @@ class UserServiceImplTest {
   @InjectMocks
   private UserServiceImpl userService;
 
+  @AfterEach
+  void clearContext() {
+    SecurityContextHolder.clearContext();
+  }
+
   @Test
   void create_ShouldSaveUserAndReturnDto() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     UserCreateDto createDto = mock(UserCreateDto.class);
     User user = new User();
     UserResponseDto expected = buildUserResponse();
+    when(userRepository.existsById(1L)).thenReturn(false);
     when(userMapper.toEntity(createDto)).thenReturn(user);
     when(userRepository.save(user)).thenReturn(user);
     when(userMapper.toDto(user)).thenReturn(expected);
@@ -66,8 +77,20 @@ class UserServiceImplTest {
   }
 
   @Test
-  void getById_ShouldReturnDto() {
+  void create_ShouldThrow_WhenUserAlreadyExists() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
+
+    when(userRepository.existsById(1L)).thenReturn(true);
+
+    assertThrows(UserAlreadyExistsException.class,
+            () -> userService.create(mock(UserCreateDto.class)));
+  }
+
+  @Test
+  void getById_adminCanAccessAnyUser() {
+    TestAuthUtil.mockAuth(2L, TestAuthUtil.ROLE_ADMIN);
     User user = new User();
+    user.setId(1L);
     UserResponseDto expected = buildUserResponse();
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(userMapper.toDto(user)).thenReturn(expected);
@@ -79,7 +102,23 @@ class UserServiceImplTest {
   }
 
   @Test
+  void getById_userCanAccessOnlySelf() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
+    User user = new User();
+    UserResponseDto expected = buildUserResponse();
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(userMapper.toDto(user)).thenReturn(expected);
+
+    UserResponseDto actual = userService.getById(1L);
+
+    assertEquals(expected.id(), actual.id());
+    verify(userRepository).findById(1L);
+  }
+
+  @Test
   void getById_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
@@ -88,6 +127,7 @@ class UserServiceImplTest {
 
   @Test
   void getAll_ShouldReturnPageWithDtos() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     UserFilter filter = mock(UserFilter.class);
     Pageable pageable = PageRequest.of(0, 10);
     User user = new User();
@@ -107,6 +147,7 @@ class UserServiceImplTest {
 
   @Test
   void update_ShouldUpdateUser() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     Long id = 1L;
     UserUpdateDto updateDto = buildUpdateDto();
     User user = new User();
@@ -123,6 +164,7 @@ class UserServiceImplTest {
 
   @Test
   void update_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     UserUpdateDto updateDto = buildUpdateDto();
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -132,6 +174,7 @@ class UserServiceImplTest {
 
   @Test
   void activate_ShouldUpdateStatus() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     User user = new User();
     user.setActive(false);
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
@@ -144,6 +187,7 @@ class UserServiceImplTest {
 
   @Test
   void activate_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,
@@ -152,6 +196,7 @@ class UserServiceImplTest {
 
   @Test
   void deactivate_ShouldUpdateStatus() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     User user = new User();
     user.setActive(true);
     PaymentCard card = new PaymentCard();
@@ -168,6 +213,7 @@ class UserServiceImplTest {
 
   @Test
   void deactivate_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class,

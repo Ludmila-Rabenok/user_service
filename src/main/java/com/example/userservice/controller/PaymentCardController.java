@@ -40,9 +40,9 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.getById(id));
   }
 
-  @GetMapping("/user/{userId}")
-  public ResponseEntity<List<PaymentCardResponseDto>> getByUserId(@PathVariable Long userId) {
-    return ResponseEntity.ok(cardService.getByUserId(userId));
+  @GetMapping("/user")
+  public ResponseEntity<List<PaymentCardResponseDto>> getUserCards() {
+    return ResponseEntity.ok(cardService.getUserCards());
   }
 
   @PostMapping
