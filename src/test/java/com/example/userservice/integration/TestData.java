@@ -18,8 +18,9 @@ public class TestData {
   private static final Random RANDOM = new Random();
 
 
-  public static User buildUser() {
+  public static User buildUser(Long userId) {
     User user = new User();
+    user.setId(userId);
     user.setName("Ivan");
     user.setSurname("ivanov");
     user.setEmail("user_" + UUID.randomUUID().toString().substring(0, 8) + "@mail.com");
@@ -32,7 +33,7 @@ public class TestData {
   public static List<User> buildUsers(int count) {
     List<User> users = new ArrayList<>();
     for (int i = 0; i < count; i++) {
-      users.add(buildUser());
+      users.add(buildUser((long) (i + 1)));
     }
     return users;
   }
@@ -40,13 +41,13 @@ public class TestData {
   public static List<User> buildUsersWithCards(int count) {
     List<User> users = new ArrayList<>();
     for (int i = 0; i < count; i++) {
-      users.add(buildUserWithCards());
+      users.add(buildUserWithCards((long) (i + 1)));
     }
     return users;
   }
 
-  public static User buildUserWithCards() {
-    User user = buildUser();
+  public static User buildUserWithCards(Long userId) {
+    User user = buildUser(userId);
     List<PaymentCard> cards = buildCards(2);
     for (PaymentCard card : cards) {
       card.setUser(user);
@@ -91,9 +92,8 @@ public class TestData {
     );
   }
 
-  public static PaymentCardCreateDto buildCardCreateDto(Long userId) {
+  public static PaymentCardCreateDto buildCardCreateDto() {
     return new PaymentCardCreateDto(
-            userId,
             "1111222233334444",
             "Ivan Ivanov",
             LocalDate.now().plusYears(2)

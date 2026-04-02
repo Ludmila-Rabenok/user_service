@@ -1,19 +1,19 @@
 package com.example.userservice.service.impl;
 
+import com.example.userservice.TestAuthUtil;
 import com.example.userservice.dto.filter.PaymentCardFilter;
 import com.example.userservice.dto.paymentcard.PaymentCardCreateDto;
 import com.example.userservice.dto.paymentcard.PaymentCardResponseDto;
 import com.example.userservice.dto.paymentcard.PaymentCardUpdateDto;
 import com.example.userservice.entity.PaymentCard;
 import com.example.userservice.entity.User;
-import com.example.userservice.exception.AccessDeniedException;
 import com.example.userservice.exception.CardLimitExceededException;
+import com.example.userservice.exception.InactiveUserException;
 import com.example.userservice.exception.PaymentCardNotFoundException;
 import com.example.userservice.exception.UserNotFoundException;
 import com.example.userservice.mapper.PaymentCardMapper;
 import com.example.userservice.repository.PaymentCardRepository;
 import com.example.userservice.repository.UserRepository;
-import com.example.userservice.security.CurrentUserProvider;
 import com.example.userservice.specification.PaymentCardSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,9 +53,6 @@ class PaymentCardServiceImplTest {
   @Mock
   private PaymentCardMapper cardMapper;
 
-  @Mock
-  private CurrentUserProvider provider;
-
   @InjectMocks
   private PaymentCardServiceImpl cardService;
 
@@ -64,6 +63,7 @@ class PaymentCardServiceImplTest {
 
   @Test
   void create_ShouldCreateCard() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     PaymentCardCreateDto dto = buildCreateDto();
     User user = new User();
     PaymentCard card = new PaymentCard();
@@ -82,24 +82,27 @@ class PaymentCardServiceImplTest {
 
   @Test
   void create_ShouldThrow_WhenUserNotFound() {
-    PaymentCardCreateDto dto = buildCreateDto();
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
 
-    when(userRepository.findByIdForUpdate(dto.userId())).thenReturn(Optional.empty());
+    PaymentCardCreateDto dto = buildCreateDto();
+    when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.empty());
 
     assertThrows(UserNotFoundException.class, () -> cardService.create(dto));
   }
 
   @Test
   void create_ShouldThrow_WhenCardLimitExceeded() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     PaymentCardCreateDto dto = buildCreateDto();
-    when(userRepository.findByIdForUpdate(dto.userId())).thenReturn(Optional.of(new User()));
-    when(cardRepository.countByUserId(dto.userId())).thenReturn(5);
+    when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(new User()));
+    when(cardRepository.countByUserId(1L)).thenReturn(5);
 
     assertThrows(CardLimitExceededException.class, () -> cardService.create(dto));
   }
 
   @Test
   void getById_ShouldReturnDto() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     PaymentCard card = new PaymentCard();
     PaymentCardResponseDto expected = buildResponseDto();
     when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
@@ -113,40 +116,21 @@ class PaymentCardServiceImplTest {
 
   @Test
   void getById_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     when(cardRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(PaymentCardNotFoundException.class, () -> cardService.getById(1L));
   }
 
   @Test
-  void getByUserId_adminCanAccessAnyUser() {
-    PaymentCard card = new PaymentCard();
-    User user = new User();
-    card.setUser(user);
-    PaymentCardResponseDto dto = buildResponseDto();
-    when(provider.getCurrentUserId()).thenReturn(99L);
-    when(provider.getCurrentRole()).thenReturn("ROLE_ADMIN");
-    when(cardRepository.findCardsByUserId(1L)).thenReturn(List.of(card));
-    when(cardMapper.toDto(card)).thenReturn(dto);
-
-    List<PaymentCardResponseDto> actual = cardService.getByUserId(1L);
-
-    assertAll(
-            () -> assertEquals(1, actual.size()),
-            () -> assertEquals(1L, actual.get(0).id())
-    );
-  }
-
-  @Test
-  void getByUserId_userCanAccessOwnCards() {
-    when(provider.getCurrentUserId()).thenReturn(1L);
-    when(provider.getCurrentRole()).thenReturn("ROLE_USER");
+  void getUserCards_userCanAccessOwnCards() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     PaymentCard card = new PaymentCard();
     PaymentCardResponseDto dto = buildResponseDto();
     when(cardRepository.findCardsByUserId(1L)).thenReturn(List.of(card));
     when(cardMapper.toDto(card)).thenReturn(dto);
 
-    List<PaymentCardResponseDto> actual = cardService.getByUserId(1L);
+    List<PaymentCardResponseDto> actual = cardService.getUserCards();
 
     assertAll(
             () -> assertEquals(1, actual.size()),
@@ -154,15 +138,8 @@ class PaymentCardServiceImplTest {
   }
 
   @Test
-  void getByUserId_userCannotAccessAnotherUsersCards() {
-    when(provider.getCurrentUserId()).thenReturn(5L);
-    when(provider.getCurrentRole()).thenReturn("ROLE_USER");
-
-    assertThrows(AccessDeniedException.class, () -> cardService.getByUserId(1L));
-  }
-
-  @Test
   void getAll_ShouldReturnPage() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     PaymentCardFilter filter = mock(PaymentCardFilter.class);
     Pageable pageable = PageRequest.of(0, 10);
     PaymentCard card = new PaymentCard();
@@ -180,9 +157,9 @@ class PaymentCardServiceImplTest {
     );
   }
 
-
   @Test
   void update_ShouldUpdateCard() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     PaymentCardUpdateDto dto = buildUpdateDto();
     PaymentCard card = new PaymentCard();
     PaymentCardResponseDto expected = buildResponseDto();
@@ -198,6 +175,7 @@ class PaymentCardServiceImplTest {
 
   @Test
   void update_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
     PaymentCardUpdateDto updateDto = buildUpdateDto();
     when(cardRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -207,6 +185,7 @@ class PaymentCardServiceImplTest {
 
   @Test
   void activate_ShouldUpdateStatus() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     PaymentCard paymentCard = new PaymentCard();
     User user = new User();
     user.setId(1L);
@@ -221,13 +200,28 @@ class PaymentCardServiceImplTest {
 
   @Test
   void activate_ShouldThrow_WhenNotFound() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     when(cardRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThrows(PaymentCardNotFoundException.class, () -> cardService.activate(1L));
   }
 
   @Test
+  void activate_ShouldThrow_WhenUserInactive() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_USER);
+    User user = new User();
+    user.setId(1L);
+    user.setActive(false);
+    PaymentCard card = new PaymentCard();
+    card.setUser(user);
+    when(cardRepository.findById(1L)).thenReturn(Optional.of(card));
+
+    assertThrows(InactiveUserException.class, () -> cardService.activate(1L));
+  }
+
+  @Test
   void deactivate_ShouldUpdateStatus() {
+    TestAuthUtil.mockAuth(1L, TestAuthUtil.ROLE_ADMIN);
     PaymentCard paymentCard = new PaymentCard();
     User user = new User();
     user.setId(1L);
@@ -246,10 +240,8 @@ class PaymentCardServiceImplTest {
     assertThrows(PaymentCardNotFoundException.class, () -> cardService.deactivate(1L));
   }
 
-
   private PaymentCardCreateDto buildCreateDto() {
     return new PaymentCardCreateDto(
-            1L,
             "1111111111111111",
             "Ivan Ivanov",
             LocalDate.of(2033, 11, 11)
